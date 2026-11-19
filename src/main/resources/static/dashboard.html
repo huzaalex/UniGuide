@@ -1,0 +1,3339 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniGuide — Panou Principal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+  :root{
+    --ink:#1B2430;
+    --ink-soft:#2A3644;
+    --paper:#EEF0F3;
+    --paper-card:#FBFBFA;
+    --gold:#E3A438;
+    --gold-deep:#C6862A;
+    --teal:#2C6E6B;
+    --slate:#5B6472;
+    --line: rgba(27,36,48,0.10);
+    --shadow: 0 10px 30px rgba(27,36,48,0.10);
+  }
+  *{box-sizing:border-box;}
+  body{
+  margin:0; min-height:100vh; display:flex; flex-direction:column; 
+  font-family:'Inter',sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  background-image: 
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:28px 28px;
+  animation: driftGrid 45s linear infinite;   /* NOU */
+}
+
+@keyframes driftGrid{ from{background-position:0 0;} to{background-position:280px 280px;} }
+
+.app-shell{
+  display:flex;
+  flex:1;
+}
+
+.sidebar{
+  width:260px; flex-shrink:0; background:var(--ink); color:#C7CDD6;
+  padding:28px 20px; display:flex; flex-direction:column;
+  overflow:hidden;   /* fără position, fără align-self, fără height */
+}
+
+.content{
+  flex:1; padding:44px 52px;
+}
+  .sidebar::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:5px;
+    background:repeating-linear-gradient(180deg, var(--gold) 0 8px, transparent 8px 20px);
+    opacity:.55;
+  }
+  .brand{
+    font-family:'Fraunces',serif; font-weight:600; font-size:21px; color:#fff;
+    letter-spacing:.2px; margin:6px 0 4px 6px;
+  }
+  .brand span{color:var(--gold);}
+  .brand-sub{
+    font-size:11px; text-transform:uppercase; letter-spacing:1.6px; color:#7C879A;
+    margin:0 0 30px 6px;
+  }
+  nav{display:flex; flex-direction:column; gap:3px;}
+  .nav-item{
+    display:flex; align-items:center; gap:12px;
+    padding:11px 12px; border-radius:6px; cursor:pointer;
+    font-size:14.5px; font-weight:500; color:#AEB6C2;
+    border-left:3px solid transparent;
+    transition:background .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .nav-item .ic{width:20px; text-align:center; font-size:15px;}
+  .nav-item:hover{background:rgba(255,255,255,0.05); color:#fff;}
+  .nav-item.active{
+    background:rgba(227,164,56,0.12); color:#fff; border-left-color:var(--gold);
+  }
+  .nav-divider{height:1px; background:rgba(255,255,255,0.08); margin:16px 6px;}
+  .logout{
+    margin-top:auto; text-align:center; padding:11px; border-radius:6px;
+    background:transparent; border:1px solid rgba(255,255,255,0.18);
+    color:#C7CDD6; text-decoration:none; font-size:13.5px; font-weight:600;
+    transition:all .18s ease;
+  }
+  .logout:hover{background:#B3432F; border-color:#B3432F; color:#fff;}
+
+  .eyebrow{
+    font-size:11.5px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--gold-deep); font-weight:700; margin:0 0 6px 2px;
+  }
+
+
+  /*ceas pt grila zilei */ 
+
+  .countdown-tag{
+    display:flex; align-items:center; gap:7px;
+    border:1px solid var(--line); border-radius:6px; padding:6px 12px;
+    background:var(--paper-card); font-family:'JetBrains Mono',monospace;
+  }
+  .countdown-label{ font-size:10.5px; color:var(--slate); text-transform:uppercase; letter-spacing:.4px; }
+  .countdown-time{ font-size:13px; font-weight:700; color:var(--gold-deep); }
+
+
+  .header{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    padding-bottom:20px; margin-bottom:34px; border-bottom:2px solid var(--ink);
+    position:relative;
+  }
+  .header::after{
+    content:""; position:absolute; left:0; bottom:-6px; width:64px; height:2px; background:var(--gold);
+  }
+  .header h1{
+    margin:0; font-family:'Fraunces',serif; font-weight:600; font-size:32px; color:var(--ink);
+  }
+  .date-tag{
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--slate);
+    border:1px solid var(--line); padding:6px 10px; border-radius:5px; background:var(--paper-card);
+  }
+
+  .fade-in{animation:fadeUp .55s ease both;}
+  @keyframes fadeUp{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+
+  /* Card grid: index-card styled modules */
+  .modules-grid{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:22px;
+  }
+  .card{
+    background:var(--paper-card); border:1px solid var(--line); border-radius:8px;
+    padding:24px 22px; cursor:pointer; position:relative; overflow:hidden;
+    box-shadow:0 1px 3px rgba(27,36,48,0.05);
+    transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+  }
+  .card::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold);
+    transform:scaleX(0); transform-origin:left; transition:transform .25s ease;
+  }
+  .card::after{
+    content:""; position:absolute; top:0; right:0; width:0; height:0;
+    border-style:solid; border-width:0 22px 22px 0;
+    border-color:transparent var(--paper) transparent transparent;
+    filter:drop-shadow(-1px 1px 1px rgba(27,36,48,0.08));
+  }
+  .card:hover{
+    transform:translateY(-6px) rotate(-0.6deg);
+    box-shadow:var(--shadow); border-color:transparent;
+  }
+  .card:hover::before{transform:scaleX(1);}
+  .card .icon{
+    width:42px; height:42px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    background:var(--ink); color:var(--gold); font-size:19px; margin-bottom:16px;
+  }
+  .card h3{
+    margin:0 0 8px; font-family:'Fraunces',serif; font-weight:600; font-size:17.5px; color:var(--ink);
+  }
+  .card p{margin:0; font-size:13.5px; color:var(--slate); line-height:1.5;}
+  .card .go{
+    display:inline-block; margin-top:14px; font-size:12.5px; font-weight:700; color:var(--teal);
+    letter-spacing:.3px;
+  }
+  .card .go::after{content:" →"; transition:margin .18s ease;}
+  .card:hover .go::after{margin-left:4px;}
+
+  /* ===== ADMITERE SECTION ===== */
+  .back-btn{
+    display:inline-flex; align-items:center; gap:6px;
+    background:transparent; border:1px solid var(--line); color:var(--ink);
+    padding:9px 14px; border-radius:6px; cursor:pointer; font-size:13px; font-weight:600;
+    margin-bottom:22px; transition:all .18s ease; font-family:'Inter',sans-serif;
+  }
+  .back-btn:hover{background:var(--ink); color:#fff; border-color:var(--ink);}
+
+  .section-lead{max-width:560px; color:var(--slate); font-size:14.5px; line-height:1.6; margin-bottom:28px;}
+
+  .uni-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:18px;}
+  .uni-card{
+    background:var(--ink); color:#fff; padding:26px 20px; border-radius:8px;
+    cursor:pointer; position:relative; overflow:hidden;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .uni-card:hover{transform:translateY(-4px); box-shadow:var(--shadow);}
+  .uni-card .tag{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1px;
+    color:var(--gold); text-transform:uppercase; display:block; margin-bottom:8px;
+  }
+  .uni-card .name{font-family:'Fraunces',serif; font-weight:600; font-size:18px;}
+  .uni-card.selected{outline:2px solid var(--gold);}
+
+  .resurse-box{
+    margin-top:30px; background:var(--paper-card); border:1px solid var(--line);
+    border-left:4px solid var(--gold); border-radius:6px; padding:22px 24px;
+    animation:fadeUp .35s ease both;
+  }
+  .resurse-box h3{margin:0 0 6px; font-family:'Fraunces',serif; font-size:16.5px;}
+  .resurse-box p{margin:0; color:var(--slate); font-size:13.5px;}
+
+  /* ===== GRILA ZILEI ===== */
+  .grila-card{
+    background:var(--paper-card); border:1px solid var(--line); border-radius:10px;
+    padding:26px 28px; margin-bottom:30px; position:relative; overflow:hidden;
+  }
+  .grila-card::before{
+    content:""; position:absolute; top:0; left:0; bottom:0; width:4px; background:var(--gold);
+  }
+  .grila-top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; flex-wrap:wrap; gap:12px;}
+  .grila-top h3{margin:0; font-family:'Fraunces',serif; font-weight:600; font-size:18.5px;}
+  .grila-facultate{
+    padding:8px 12px; border:1.5px solid var(--line); border-radius:6px; background:#fff;
+    font-family:'Inter',sans-serif; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer;
+  }
+  .grila-body{min-height:60px;}
+  .grila-intrebare{font-size:15px; line-height:1.6; margin:0 0 18px; color:var(--ink);}
+  .grila-optiuni{display:flex; flex-direction:column; gap:10px;}
+  .optiune{
+    display:flex; align-items:center; gap:12px; padding:11px 14px;
+    border:1.5px solid var(--line); border-radius:7px; cursor:pointer; background:#fff;
+    font-size:13.5px; transition:all .18s ease;
+  }
+  .optiune:hover{border-color:var(--gold); background:#FFFBF3;}
+  .optiune .lit{
+    width:24px; height:24px; border-radius:50%; background:var(--paper); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:700; color:var(--slate);
+  }
+  .optiune.corect{border-color:var(--teal); background:#F0F7F6;}
+  .optiune.corect .lit{background:var(--teal); color:#fff;}
+  .optiune.gresit{border-color:#B3432F; background:#FBF1EF;}
+  .optiune.gresit .lit{background:#B3432F; color:#fff;}
+  .optiune.dezactivat{cursor:default;}
+
+  .grila-explicatie{
+    margin-top:16px; padding:14px 16px; background:var(--paper); border-radius:7px;
+    font-size:13px; color:var(--slate); line-height:1.6; display:none;
+    animation:fadeUp .3s ease both;
+  }
+  .grila-explicatie.show{display:block;}
+  .grila-explicatie b{color:var(--ink);}
+
+  .grila-loading, .grila-eroare{
+    font-size:13.5px; color:var(--slate); display:flex; align-items:center; gap:10px;
+  }
+  .grila-eroare{color:#B3432F;}
+  .mini-spinner{
+    width:15px; height:15px; border:2px solid var(--line); border-top-color:var(--gold);
+    border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0;
+  }
+
+  /*Dreptunghiuri animate inceput*/
+  .floaty-zone{ position:relative; }
+.floaty{ cursor:pointer; will-change:transform; }
+.floaty-inner{
+  transition: box-shadow .2s ease, transform .35s ease;
+}
+.floaty:hover .floaty-inner{ box-shadow:0 22px 46px rgba(0,0,0,0.28); }
+
+.floaty-inner.nudge{ animation:floatyNudge .4s ease; }
+@keyframes floatyNudge{
+  0%{ transform:scale(1) rotate(0deg); }
+  35%{ transform:scale(1.06) rotate(-3deg); }
+  65%{ transform:scale(0.97) rotate(3deg); }
+  100%{ transform:scale(1) rotate(0deg); }
+}
+
+.floaty-popup{
+  position:absolute; bottom:calc(100% + 10px); left:50%;
+  transform:translateX(-50%) translateY(6px);
+  background:var(--ink); color:#fff; padding:10px 14px; border-radius:8px;
+  font-size:12px; width:190px; text-align:left; line-height:1.5;
+  box-shadow:0 14px 28px rgba(0,0,0,0.32);
+  opacity:0; transition:opacity .2s ease, transform .2s ease;
+  pointer-events:none; z-index:30; font-family:'Inter',sans-serif;
+}
+.floaty-popup::after{
+  content:""; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+  border:6px solid transparent; border-top-color:var(--ink);
+}
+.floaty-popup.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+
+/*Dreptunghiuri animate final*/
+
+
+.floaty-zone{ position:relative; }
+.floaty{ cursor:pointer; will-change:transform; }
+.floaty-inner{ transition: box-shadow .2s ease; }
+.floaty:hover .floaty-inner{ box-shadow:0 14px 30px rgba(0,0,0,0.25); }
+
+.floaty-inner.nudge{ animation:floatyNudge .4s ease; }
+@keyframes floatyNudge{
+  0%{ transform:scale(1) rotate(0deg); }
+  35%{ transform:scale(1.08) rotate(-4deg); }
+  65%{ transform:scale(0.96) rotate(4deg); }
+  100%{ transform:scale(1) rotate(0deg); }
+}
+
+.preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.preview-item {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #d9dce3;
+    background: #f5f5f5;
+}
+
+.preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.preview-remove {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+
+    width: 27px;
+    height: 27px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(30, 35, 45, 0.85);
+    color: white;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.preview-remove:hover {
+    background: #b3432f;
+    transform: scale(1.08);
+}
+/*Pt aspect la poze dupa ce le pun in Memorator */
+
+.preview-files {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 22px;
+}
+
+.no-files {
+    color: #858b95;
+    font-size: 14px;
+}
+
+.preview-file {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border: 1px solid #d9dce3;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transition: 0.2s ease;
+}
+
+.preview-file:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.preview-file img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.preview-number {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #c99a25;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    z-index: 2;
+}
+
+.pdf-preview {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    text-align: center;
+    font-size: 30px;
+}
+
+.pdf-preview span {
+    font-size: 12px;
+    color: #707784;
+    word-break: break-word;
+}
+
+
+/*Memorator design*/
+
+.memorator-box {
+    width: min(900px, 90%);
+    margin: 40px auto 80px;
+    padding: 28px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #d9dce2;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+
+/* UPLOAD */
+
+.upload-area {
+    border: 2px dashed #d7d9df;
+    border-radius: 14px;
+    padding: 35px 20px;
+    text-align: center;
+    background: #fafafa;
+    transition: 0.25s ease;
+}
+
+.upload-area:hover {
+    border-color: #c99a25;
+    background: #fffdf7;
+}
+
+.upload-icon {
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+
+.upload-area h3 {
+    margin: 5px 0;
+    font-size: 20px;
+}
+
+.upload-area p {
+    margin: 6px 0 18px;
+    color: #707784;
+}
+
+.upload-button {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 8px;
+    background: #222936;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.upload-button:hover {
+    transform: translateY(-2px);
+    background: #151b24;
+}
+
+#fileName {
+    display: block;
+    margin-top: 12px;
+    color: #858b95;
+    font-size: 14px;
+}
+
+
+.file-preview {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.file-preview-item {
+    position: relative;
+    width: 150px;
+    height: 110px;
+    border: 1px solid #d9dce3;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.file-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.file-remove {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(30, 35, 45, 0.88);
+    color: white;
+
+    font-size: 18px;
+    cursor: pointer;
+
+    z-index: 5;
+    transition: .2s ease;
+}
+
+.file-remove:hover {
+    background: #c99a25;
+    transform: scale(1.1);
+}
+
+.file-pdf {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+    font-weight: 600;
+}
+
+
+/* OPTIONS */
+
+.generate-section {
+    margin-top: 30px;
+}
+
+.generate-section > h3 {
+    margin-bottom: 15px;
+}
+
+.generation-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.generation-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    padding: 18px;
+    min-height: 74px;
+
+    border: 1px solid #d9dce3;
+    border-radius: 12px;
+    background: #fff;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* când treci cu mouse-ul peste orice opțiune */
+.generation-option:hover {
+    background: #fff8e6;
+    border-color: #c9a227;
+    transform: translateY(-2px);
+}
+
+/* opțiunea selectată */
+
+.generation-option:has(input[type="radio"]:checked) {
+    background: #fff8e6;
+    border-color: #c9a227;
+    box-shadow: 0 4px 12px rgba(201, 154, 37, 0.12);
+}
+
+/* ascundem radio-ul clasic */
+.generation-option input[type="radio"] {
+    display: none;
+}
+
+
+.generation-option span {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    text-align: center;
+}
+
+.generation-option strong {
+    font-size: 16px;
+    color: #252a36;
+}
+
+.generation-option small {
+    font-size: 14px;
+    color: #858b99;
+}
+
+/* BUTTON */
+
+.generate-button {
+    display: block;
+    width: 100%;
+    margin-top: 22px;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #c99a25;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.generate-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(201,154,37,0.25);
+}
+
+
+
+
+.settings-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 20, 28, 0.68);
+    backdrop-filter: blur(5px);
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+
+    padding: 30px;
+}
+
+.settings-overlay.show {
+    display: flex;
+    animation: settingsFadeIn .2s ease;
+}
+
+@keyframes settingsFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+/* FEREASTRA */
+
+.settings-window {
+    width: min(1050px, 100%);
+    height: min(720px, 90vh);
+
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.35);
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+
+    animation: settingsWindowIn .3s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes settingsWindowIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+}
+
+
+/* HEADER */
+
+.settings-header {
+    padding: 25px 30px;
+
+    border-bottom: 1px solid var(--line);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    background: var(--paper-card);
+}
+
+.settings-header h2 {
+    margin: 3px 0 4px;
+
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    color: var(--ink);
+}
+
+.settings-header p {
+    margin: 0;
+
+    font-size: 13px;
+    color: var(--slate);
+}
+
+.settings-close {
+
+    width: 36px;
+    height: 36px;
+
+    border: 1px solid var(--line);
+    border-radius: 7px;
+
+    background: transparent;
+    color: var(--slate);
+
+    font-size: 25px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition: .18s ease;
+}
+
+.settings-close:hover {
+
+    background: var(--ink);
+    color: white;
+
+    
+
+}
+
+
+/* BODY */
+
+.settings-body {
+    flex: 1;
+
+    display: flex;
+
+    min-height: 0;
+}
+
+
+/* NAVIGARE SETARI */
+
+.settings-nav {
+
+    width: 245px;
+    flex-shrink: 0;
+
+    padding: 20px 14px;
+
+    background: var(--paper-card);
+
+    border-right: 1px solid var(--line);
+
+    overflow-y: auto;
+}
+
+.settings-nav-item {
+
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 11px 12px;
+
+    margin-bottom: 4px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: var(--slate);
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition: .18s ease;
+}
+
+.settings-nav-item > span {
+
+    width: 27px;
+    height: 27px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--paper);
+
+    border-radius: 6px;
+
+    font-size: 14px;
+}
+
+.settings-nav-item strong {
+
+    display: block;
+
+    color: inherit;
+
+    font-size: 13px;
+}
+
+.settings-nav-item small {
+
+    display: block;
+
+    margin-top: 2px;
+
+    color: #8b929d;
+
+    font-size: 10.5px;
+}
+
+.settings-nav-item:hover {
+
+    background: rgba(227,164,56,.08);
+
+    color: var(--ink);
+
+}
+
+.settings-nav-item.active {
+
+    background: rgba(227,164,56,.13);
+
+    color: var(--ink);
+
+    box-shadow: inset 3px 0 var(--gold);
+
+}
+
+.settings-nav-item.active > span {
+
+    background: var(--ink);
+
+    color: var(--gold);
+
+}
+
+.settings-nav-item.danger-nav {
+
+    margin-top: 12px;
+
+    border-top: 1px solid var(--line);
+
+    border-radius: 0;
+
+    padding-top: 17px;
+
+}
+
+.settings-nav-item.danger-nav:hover {
+
+    color: #B3432F;
+
+}
+
+
+/* CONTINUT */
+
+.settings-content {
+
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 30px 34px;
+
+    background: var(--paper);
+}
+
+.settings-section {
+
+    display: none;
+
+    animation: settingsSectionIn .25s ease;
+}
+
+.settings-section.active {
+
+    display: block;
+}
+
+@keyframes settingsSectionIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+/* TITLU */
+
+.settings-section-title {
+
+    margin-bottom: 22px;
+}
+
+.settings-section-title h3 {
+
+    margin: 0 0 5px;
+
+    font-family: 'Fraunces', serif;
+
+    font-size: 22px;
+
+    color: var(--ink);
+}
+
+.settings-section-title p {
+
+    margin: 0;
+
+    color: var(--slate);
+
+    font-size: 13px;
+
+}
+
+
+/* CARD */
+
+.settings-card {
+
+    background: var(--paper-card);
+
+    border: 1px solid var(--line);
+
+    border-radius: 9px;
+
+    padding: 22px;
+
+    margin-bottom: 16px;
+
+    box-shadow: 0 2px 8px rgba(27,36,48,.035);
+}
+
+.settings-card-header {
+
+    margin-bottom: 18px;
+}
+
+.settings-card h4 {
+
+    margin: 0 0 5px;
+
+    font-size: 14.5px;
+
+    color: var(--ink);
+}
+
+.settings-card-header p,
+.settings-card > p {
+
+    margin: 0;
+
+    color: var(--slate);
+
+    font-size: 12.5px;
+}
+
+
+/* CAMPURI */
+
+.settings-grid {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 15px;
+
+    margin-bottom: 18px;
+}
+
+.settings-field {
+
+    margin-bottom: 15px;
+}
+
+.settings-field label {
+
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: var(--slate);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: .4px;
+}
+
+.settings-field input,
+.settings-select {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 10px 12px;
+
+    border: 1px solid var(--line);
+
+    border-radius: 6px;
+
+    background: #fff;
+
+    color: var(--ink);
+
+    font-family: 'Inter', sans-serif;
+
+    font-size: 13px;
+
+    outline: none;
+
+    transition: .18s ease;
+}
+
+.settings-field input:focus,
+.settings-select:focus {
+
+    border-color: var(--gold);
+
+    box-shadow: 0 0 0 3px rgba(227,164,56,.13);
+
+}
+
+
+/* BUTOANE */
+
+.settings-primary-btn {
+
+    border: none;
+
+    border-radius: 6px;
+
+    padding: 10px 16px;
+
+    background: var(--ink);
+
+    color: white;
+
+    font-size: 12.5px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: .18s ease;
+}
+
+.settings-primary-btn:hover {
+
+    background: var(--ink-soft);
+
+    transform: translateY(-1px);
+
+}
+
+.secondary-btn {
+
+    border: 1px solid var(--line);
+
+    border-radius: 6px;
+
+    padding: 9px 13px;
+
+    background: var(--paper);
+
+    color: var(--ink);
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: .18s ease;
+}
+
+.secondary-btn:hover {
+
+    background: var(--ink);
+
+    color: white;
+
+    border-color: var(--ink);
+
+}
+
+
+/* RANDURI */
+
+.setting-row {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 15px 0;
+
+    border-bottom: 1px solid var(--line);
+}
+
+.setting-row:first-child {
+
+    padding-top: 0;
+
+}
+
+.setting-row:last-child {
+
+    border-bottom: none;
+
+    padding-bottom: 0;
+
+}
+
+.setting-row strong {
+
+    display: block;
+
+    font-size: 13.5px;
+
+    color: var(--ink);
+
+}
+
+.setting-row span {
+
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 11.5px;
+
+    color: var(--slate);
+
+}
+
+
+/* SWITCH */
+
+.switch {
+
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 22px;
+
+}
+
+.switch input {
+
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+
+    position: absolute;
+
+    inset: 0;
+
+    background: #d1d5dd;
+
+    border-radius: 999px;
+
+    cursor: pointer;
+
+    transition: .25s ease;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 2px;              /* ← poziția în stânga */
+    top: 0px;
+    right: 10px;
+    transform: translateY(0%);
+    background: #fff;
+    border-radius: 50%;
+    transition: .2s ease;
+}
+
+.switch input:checked + .slider {
+
+    background: var(--gold);
+
+}
+
+.switch input:checked + .slider::before {
+
+    transform: translateX(22px);
+
+}
+
+
+/* TEME */
+
+.theme-options {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 12px;
+}
+
+.theme-option {
+
+    position: relative;
+
+    padding: 12px;
+
+    border: 1px solid var(--line);
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    transition: .18s ease;
+}
+
+.theme-option:hover {
+
+    border-color: var(--gold);
+
+    transform: translateY(-2px);
+
+}
+
+.theme-option input {
+
+    position: absolute;
+
+    opacity: 0;
+
+}
+
+.theme-option:has(input:checked) {
+
+    border-color: var(--gold);
+
+    background: #fffaf0;
+
+    box-shadow: 0 3px 10px rgba(201,154,37,.12);
+
+}
+
+.theme-option strong {
+
+    display: block;
+
+    margin-top: 10px;
+
+    font-size: 12.5px;
+
+    color: var(--ink);
+
+}
+
+.theme-option small {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--slate);
+
+    font-size: 10.5px;
+
+}
+
+
+/* PREVIEW TEME */
+
+.theme-preview {
+
+    height: 65px;
+
+    border-radius: 5px;
+
+    padding: 8px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+}
+
+.theme-preview div {
+
+    height: 7px;
+
+    border-radius: 3px;
+}
+
+.light-preview {
+
+    background: #f4f5f7;
+
+}
+
+.light-preview div {
+
+    background: #d5d9df;
+
+}
+
+.light-preview div:first-child {
+
+    width: 70%;
+
+    background: #252a36;
+
+}
+
+.dark-preview {
+
+    background: #1d2430;
+
+}
+
+.dark-preview div {
+
+    background: #3b4350;
+
+}
+
+.dark-preview div:first-child {
+
+    width: 70%;
+
+    background: #c99a25;
+
+}
+
+.system-preview {
+
+    background: linear-gradient(
+        90deg,
+        #f4f5f7 50%,
+        #1d2430 50%
+    );
+
+}
+
+.system-preview div {
+
+    background: #aaa;
+
+}
+
+
+/* ABONAMENT */
+
+.subscription-card {
+
+    padding: 22px;
+
+    margin-bottom: 16px;
+
+    border-radius: 9px;
+
+    background: var(--ink);
+
+    color: white;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+.subscription-label {
+
+    color: var(--gold) !important;
+
+    font-size: 10px !important;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+}
+
+.subscription-card h3 {
+
+    margin: 5px 0;
+
+    font-family: 'Fraunces', serif;
+
+    font-size: 21px;
+}
+
+.subscription-card p {
+
+    margin: 0;
+
+    color: #9da6b4;
+
+    font-size: 12px;
+}
+
+.subscription-badge {
+
+    padding: 5px 9px;
+
+    border-radius: 5px;
+
+    background: rgba(227,164,56,.15);
+
+    color: var(--gold) !important;
+
+    font-size: 10px !important;
+
+    font-weight: 700;
+
+}
+
+.premium-list {
+
+    list-style: none;
+
+    padding: 0;
+
+    margin: 17px 0;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 8px;
+
+}
+
+.premium-list li {
+
+    color: var(--slate);
+
+    font-size: 12px;
+
+}
+
+.premium-btn {
+
+    width: 100%;
+
+    padding: 11px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background: var(--gold);
+
+    color: var(--ink);
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: .18s ease;
+}
+
+.premium-btn:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 7px 18px rgba(201,154,37,.25);
+
+}
+
+
+/* ZONA PERICULOASA */
+
+.danger-card {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 20px;
+
+    margin-bottom: 14px;
+
+    border: 1px solid rgba(179,67,47,.3);
+
+    border-left: 4px solid #B3432F;
+
+    border-radius: 8px;
+
+    background: #fff8f6;
+}
+
+.danger-card h4 {
+
+    margin: 0 0 5px;
+
+    color: #8e3020;
+
+    font-size: 14px;
+
+}
+
+.danger-card p {
+
+    margin: 0;
+
+    color: #7b6863;
+
+    font-size: 11.5px;
+
+    line-height: 1.5;
+
+}
+
+.danger-btn {
+
+    flex-shrink: 0;
+
+    border: 1px solid #B3432F;
+
+    border-radius: 6px;
+
+    padding: 9px 13px;
+
+    background: transparent;
+
+    color: #B3432F;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: .18s ease;
+}
+
+.danger-btn:hover {
+
+    background: #B3432F;
+
+    color: white;
+
+}
+
+
+/* MOBILE */
+
+@media (max-width: 760px) {
+
+    .settings-overlay {
+
+        padding: 10px;
+
+    }
+
+    .settings-window {
+
+        height: 95vh;
+
+    }
+
+    .settings-body {
+
+        flex-direction: column;
+
+    }
+
+    .settings-nav {
+
+        width: auto;
+
+        display: flex;
+
+        overflow-x: auto;
+
+        border-right: none;
+
+        border-bottom: 1px solid var(--line);
+
+        padding: 8px;
+
+    }
+
+    .settings-nav-item {
+
+        min-width: 130px;
+
+    }
+
+    .settings-nav-item small {
+
+        display: none;
+
+    }
+
+    .settings-nav-item.danger-nav {
+
+        margin-top: 0;
+
+        border-top: none;
+
+        padding-top: 11px;
+
+    }
+
+    .settings-content {
+
+        padding: 22px 18px;
+
+    }
+
+    .settings-grid,
+    .theme-options {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .premium-list {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .setting-row {
+
+        align-items: flex-start;
+
+    }
+
+}
+
+
+
+
+
+
+
+  /*FOOTER DESIGN*/
+footer{
+    background:var(--ink); color:#AEB6C2; padding:22px 32px 16px; position:relative; overflow:hidden;
+}
+  footer::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:5px;
+    background:repeating-linear-gradient(180deg, var(--gold) 0 8px, transparent 8px 20px); opacity:.5;
+  }
+  .footer-inner{ max-width:880px; margin:0 auto; }
+  .footer-top{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:24px; margin-bottom:18px; }
+
+  .footer-brand .brand-mark{ font-family:'Fraunces',serif; font-weight:700; font-size:19px; color:#fff; margin-bottom:8px; }
+  .footer-brand .brand-mark span{ color:var(--gold); }
+  .footer-brand p{ font-size:12.5px; color:#8891A0; max-width:260px; line-height:1.6; margin:0; }
+
+  .footer-col h4{ font-size:11.5px; letter-spacing:1px; text-transform:uppercase; color:var(--gold); margin:0 0 12px; font-weight:700; }
+  .footer-col a{ display:block; color:#AEB6C2; text-decoration:none; font-size:13px; margin-bottom:6px; transition:color .15s ease; }
+  .footer-col a:hover{ color:#fff; }
+
+  .footer-contact a{ display:flex; align-items:center; gap:8px; }
+
+  .social-row{ display:flex; gap:10px; margin-top:4px; }
+  .social-row a{
+    width:34px; height:34px; border-radius:8px; background:rgba(255,255,255,0.06); display:flex;
+    align-items:center; justify-content:center; font-size:15px; text-decoration:none; color:#C7CDD6;
+    transition:background .18s ease, transform .18s ease;
+  }
+  .social-row a:hover{ background:var(--gold); color:var(--ink); transform:translateY(-2px); }
+
+  .footer-bottom{
+    border-top:1px solid rgba(255,255,255,0.08); padding-top:18px; display:flex; flex-wrap:wrap;
+    justify-content:space-between; gap:10px; font-size:12px; color:#7C879A;
+  }
+  .footer-bottom .legal-links{ display:flex; gap:18px; flex-wrap:wrap; }
+  .footer-bottom .legal-links a{ color:#7C879A; text-decoration:none; }
+  .footer-bottom .legal-links a:hover{ color:#fff; }
+
+  .footer-logout{
+  display:none; position:absolute; left:32px; bottom:22px; width:196px; text-align:center;
+  background:transparent; border:1px solid rgba(255,255,255,0.18); color:#C7CDD6; text-decoration:none;
+  padding:11px; border-radius:6px; font-size:13.5px; font-weight:600; font-family:'Inter',sans-serif;
+  transition:all .18s ease; z-index:5;
+}
+.footer-logout:hover{ background:#B3432F; border-color:#B3432F; color:#fff; }
+.footer-logout.show{ display:block; }
+
+/* ========================================================
+   DESIGN ADAPTIV (RESPONSIVE) PENTRU TELEFOANE ȘI TABLETE
+   ======================================================== */
+@media (max-width: 968px) {
+    .footer-top {
+        grid-template-columns: repeat(2, 1fr); /* Se transformă în 2 coloane pe tablete */
+        gap: 30px;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer-top {
+        grid-template-columns: 1fr; /* O singură coloană pe telefoane mobile */
+        gap: 25px;
+    }
+    
+    .footer-bottom {
+        flex-direction: column; /* Pune link-urile legale sub copyright pe telefon */
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .legal-links {
+        justify-content: center;
+    }
+}
+
+
+  @keyframes spin{ to{transform:rotate(360deg);} }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+  @media (max-width:720px){
+    .sidebar{width:200px; padding:20px 12px;}
+    .content{padding:28px 22px;}
+    .header{flex-direction:column; align-items:flex-start; gap:10px;}
+  }
+/* =========================================================
+   SETTINGS MODAL
+========================================================= */
+
+</style>
+</head>
+<body>
+  <div class="app-shell">
+  <div class="sidebar">
+    <div class="brand">Uni<span>Guide</span></div>
+    <div class="brand-sub">Panou de studiu</div>
+    <nav>
+      <a class="nav-item active" id="nav-acasa" onclick="arataAcasa()"><span class="ic">🏠</span> Acasă</a>
+      <a class="nav-item" id="nav-admitere" onclick="arataAdmitere()"><span class="ic">🎓</span> Admitere Facultăți</a>
+      <a class="nav-item" onclick="deschideConvertor()">
+    <span class="ic">🛠️</span> Convertor Fișiere
+</a>
+      <a class="nav-item"><span class="ic">📝</span> Flashcards &amp; Cursuri</a>
+      <a class="nav-item"><span class="ic">💻</span> Compilator C++</a>
+    </nav>
+    <div class="nav-divider"></div>
+
+    <div class="nav-item" id="nav-setari" onclick="deschideSetari()">
+        <span>Setări</span>
+    </div>
+  </div>
+  
+  <div class="content" id="zona-continut">
+    <div id="sectiune-acasa">
+      <div class="header fade-in">
+        <div>
+          <p class="eyebrow">Sesiune activă</p>
+          <h1 id="welcome-msg">Bine ai venit!</h1>
+        </div>
+        <div class="date-tag" id="date-tag"></div>
+      </div>
+
+      <div class="grila-card fade-in">
+        <div class="grila-top">
+          <div>
+            <p class="eyebrow" style="margin-bottom:2px;">Grila zilei</p>
+            <h3>Testează-te înainte de admitere</h3>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div class="countdown-tag" id="countdown-tag">
+              <span class="countdown-label">Grilă nouă în</span>
+              <span class="countdown-time" id="countdown-time">--:--:--</span>
+            </div>
+            <select class="grila-facultate" id="grila-facultate" onchange="incarcaGrilaZilei()">
+              <option value="UPB">Politehnica (UPB)</option>
+              <option value="ASE CSIE">ASE CSIE</option>
+              <option value="UB">Universitatea București</option>
+              <option value="UBB">UBB Cluj</option>
+            </select>
+          </div>
+        </div>
+        <div class="grila-body" id="grila-body">
+          <div class="grila-loading"><span class="mini-spinner"></span> Se încarcă grila zilei...</div>
+        </div>
+      </div>
+
+      <div class="modules-grid fade-in" style="animation-delay:.08s">
+        <div class="card" onclick="arataAdmitere()">
+          <div class="icon">🎓</div>
+          <h3>Admitere</h3>
+          <p>Subiecte și resurse pentru UPB, UB, UBB și ASE CSIE.</p>
+          <span class="go">Explorează</span>
+        </div>
+    <div class="card" onclick="deschideConvertor()">
+        <div class="icon">🛠️</div>
+        <h3>Convertor PDF</h3>
+        <p>Transformă rapid JPG în PDF pentru teme și cursuri.</p>
+        <span class="go">Deschide</span>
+    </div>
+        <div class="card" onclick="arataMemoratoare()">
+            <div class="icon">📝</div>
+            <h3>Memoratoare</h3>
+            <p>Flashcards, chestionare și cheat sheets generate din cursuri.</p>
+            <span class="go">Studiază</span>
+        </div>
+        <div class="card">
+          <div class="icon">💻</div>
+          <h3>Code Editor</h3>
+          <p>Scrie și rulează cod C++ direct din browser.</p>
+          <span class="go">Rulează</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <div id="site-footer"></div>
+<script>
+  const user = sessionStorage.getItem("username") || localStorage.getItem("username") || "Viitor Student";
+  document.getElementById("welcome-msg").innerText = `Bine ai venit, ${user}!`;
+  document.getElementById("date-tag").innerText = new Date().toLocaleDateString('ro-RO', { weekday:'long', day:'numeric', month:'long' });
+  let fisiereSelectate = [];
+  const continutAcasa = document.getElementById("sectiune-acasa").innerHTML;
+  incarcaGrilaZilei();
+
+  function setActiveNav(id){
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const el = document.getElementById(id);
+    if(el) el.classList.add('active');
+  }
+
+
+  function arataAcasa(){
+    document.getElementById("zona-continut").innerHTML = `<div id="sectiune-acasa" class="fade-in">${continutAcasa}</div>`;
+    document.getElementById("welcome-msg").innerText = `Bine ai venit, ${user}!`;
+    document.getElementById("date-tag").innerText = new Date().toLocaleDateString('ro-RO', { weekday:'long', day:'numeric', month:'long' });
+    setActiveNav('nav-acasa');
+  }
+
+  function deschideConvertor() {
+    window.location.href = "convertor.html";
+}
+
+
+  function arataAdmitere(){
+    const html = `
+        <button class="back-btn" onclick="arataAcasa()">
+            ← Înapoi la Dashboard
+        </button>
+
+        <div class="header" style="border:none; margin-bottom:10px; padding-bottom:0;">
+            <div>
+                <p class="eyebrow">PREGĂTIRE ADMITERE</p>
+                <h1>Alege universitatea</h1>
+            </div>
+        </div>
+
+        <p class="section-lead">
+            Culegeri, subiecte din anii trecuți și materiale de pregătire,
+            organizate pe facultate.
+        </p>
+
+        <div class="uni-grid">
+
+            <div class="uni-card" onclick="window.location.href='upb.html'">
+                <span class="tag">
+                    Universitatea Națională de Știință și Tehnologie POLITEHNICA București
+                </span>
+                <span class="name">Politehnica (UPB)</span>
+            </div>
+
+            <div class="uni-card" onclick="incarcaResurse(this,'ASE CSIE')">
+                <span class="tag">
+                    Academia de Studii Economice
+                </span>
+                <span class="name">ASE CSIE</span>
+            </div>
+
+            <div class="uni-card" onclick="incarcaResurse(this,'UB')">
+                <span class="tag">
+                    Facultatea de Matematică și Informatică
+                </span>
+                <span class="name">Universitatea București</span>
+            </div>
+
+            <div class="uni-card" onclick="incarcaResurse(this,'UBB')">
+                <span class="tag">
+                    Universitatea Babeș-Bolyai
+                </span>
+                <span class="name">UBB Cluj</span>
+            </div>
+
+        </div>
+
+        <div id="zona-resurse"></div>
+    `;
+
+    document.getElementById("zona-continut").innerHTML =
+        `<div class="fade-in">${html}</div>`;
+    
+
+        const fisiereNoi = Array.from(this.files);
+
+        fisiereSelectate.push(...fisiereNoi);
+
+        afiseazaPreview();
+
+        this.value = "";
+
+
+    setActiveNav("nav-admitere");
+}
+
+  function scapaHtml(text){
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+
+  async function incarcaGrilaZilei(){
+    const facultate = document.getElementById('grila-facultate').value;
+    const body = document.getElementById('grila-body');
+    body.innerHTML = `<div class="grila-loading"><span class="mini-spinner"></span> Se încarcă grila zilei...</div>`;
+
+    try {
+  const response = await fetch(`http://localhost:8089/api/grila-zilei?facultate=${encodeURIComponent(facultate)}`);
+  if (!response.ok) throw new Error('Serverul a răspuns cu eroare.');
+
+  const grila = await response.json(); // acum e direct obiectul grilei, fără înveliș
+  randeazaGrila(grila);
+
+} catch (err) {
+  body.innerHTML = `<div class="grila-eroare">⚠ Nu am putut încărca grila zilei (${err.message}). Verifică dacă serverul Java rulează.</div>`;
+}
+  }
+
+  function randeazaGrila(grila){
+    const body = document.getElementById('grila-body');
+    const litere = ['A', 'B', 'C', 'D'];
+
+    const optiuniHtml = grila.variante.map((v, i) => `
+      <div class="optiune" data-index="${i}" onclick="verificaRaspuns(${i})">
+        <span class="lit">${litere[i]}</span>
+        <span>${scapaHtml(v)}</span>
+      </div>
+    `).join('');
+
+    body.innerHTML = `
+      <p class="grila-intrebare">${scapaHtml(grila.intrebare)}</p>
+      <div class="grila-optiuni" id="grila-optiuni"
+           data-corect="${grila.raspunsCorect}"
+           data-explicatie="${encodeURIComponent(grila.explicatie || '')}">
+        ${optiuniHtml}
+      </div>
+      <div class="grila-explicatie" id="grila-explicatie"></div>
+    `;
+
+    // Randăm formulele matematice (LaTeX) din întrebare și variante
+    renderMathInElement(body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ],
+        throwOnError: false
+    });
+}
+
+  function verificaRaspuns(indexAles){
+    const container = document.getElementById('grila-optiuni');
+    const corect = parseInt(container.dataset.corect, 10);
+    const explicatie = decodeURIComponent(container.dataset.explicatie);
+
+    document.querySelectorAll('#grila-optiuni .optiune').forEach(el => {
+      const idx = parseInt(el.dataset.index, 10);
+      el.classList.add('dezactivat');
+      el.onclick = null;
+      if (idx === corect) el.classList.add('corect');
+      else if (idx === indexAles) el.classList.add('gresit');
+    });
+
+    if (explicatie){
+      const expDiv = document.getElementById('grila-explicatie');
+      expDiv.innerHTML = `<b>Explicație:</b> ${scapaHtml(explicatie)}`;
+      expDiv.classList.add('show');
+
+      renderMathInElement(expDiv, {
+          delimiters: [
+              {left: "$$", right: "$$", display: true},
+              {left: "$", right: "$", display: false}
+          ],
+          throwOnError: false
+      });
+    }
+}
+
+  function incarcaResurse(cardEl, universitate){
+    document.querySelectorAll('.uni-card').forEach(c => c.classList.remove('selected'));
+    cardEl.classList.add('selected');
+    const zona = document.getElementById("zona-resurse");
+    zona.innerHTML = `
+      <div class="resurse-box">
+        <h3>Resurse — ${universitate}</h3>
+        <p>Aici vor apărea automat linkurile din fișierul tău CSV (subiecte, bareme, ghiduri de admitere).</p>
+      </div>`;
+  }
+
+  fetch('footer.html')
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById('site-footer').innerHTML = html;
+
+    const esteLogat = sessionStorage.getItem('token') || localStorage.getItem('username');
+    if (esteLogat) {
+      document.getElementById('footer-logout-btn').classList.add('show');
+      document.getElementById('footer-logout-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        sessionStorage.removeItem('token');
+        localStorage.removeItem('username');
+        window.location.href = 'index.html';
+      });
+    }
+  });
+
+  function actualizeazaCountdown(){
+  const acum = new Date();
+  const miezulNoptii = new Date(acum);
+  miezulNoptii.setHours(24, 0, 0, 0); // ora 00:00 a zilei următoare
+
+  const diferentaMs = miezulNoptii - acum;
+  const ore = Math.floor(diferentaMs / (1000 * 60 * 60));
+  const minute = Math.floor((diferentaMs % (1000 * 60 * 60)) / (1000 * 60));
+  const secunde = Math.floor((diferentaMs % (1000 * 60)) / 1000);
+
+  const format = (n) => String(n).padStart(2, '0');
+  const el = document.getElementById('countdown-time');
+  if (el) el.innerText = `${format(ore)}:${format(minute)}:${format(secunde)}`;
+}
+
+actualizeazaCountdown();
+setInterval(actualizeazaCountdown, 1000);
+
+function arataMemoratoare(){
+
+    const html = `
+        <div class="memoratoare-page">
+
+            <button class="back-btn" onclick="location.reload()">
+                ← Înapoi la Dashboard
+            </button>
+
+            <div class="page-heading">
+                <span class="eyebrow">MEMORATOARE</span>
+                <h1>Generează din cursul tău</h1>
+                <p>
+                    Transformă notițele tale în materiale de învățare
+                    personalizate.
+                </p>
+            </div>
+
+
+            <div class="memorator-box">
+
+              <div class="upload-area">
+
+                  <div class="upload-icon">📄</div>
+
+                  <h3>Încarcă materialul de curs</h3>
+
+                  <p>
+                      PNG, JPG sau PDF • Maximum 5 MB / fișier
+                  </p>
+
+                  <label for="fisier-curs" class="upload-button">
+                      Alege fișiere
+                  </label>
+
+                  <input
+                      type="file"
+                      id="fisier-curs"
+                      name="fisiere"
+                      accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
+                      multiple
+                      style="display:none;"
+                  >
+
+                  <div id="preview-container" class="preview-container">
+                      <span id="fileName">Niciun fișier selectat</span>
+                  </div>
+
+              </div>
+
+
+                <div class="generate-section">
+
+                    <h3>Ce vrei să generezi?</h3>
+
+                    <div class="generation-options">
+
+                        <label class="generation-option">
+                            <input
+                                type="radio"
+                                name="tip-continut"
+                                value="flashcards"
+                                
+                            >
+
+                            <span>
+                                <strong>Flashcards</strong>
+                                <small>Învață rapid conceptele</small>
+                            </span>
+                        </label>
+
+
+                        <label class="generation-option">
+                            <input
+                                type="radio"
+                                name="tip-continut"
+                                value="chestionar"
+                            >
+
+                            <span>
+                                <strong>Chestionar</strong>
+                                <small>Testează-ți cunoștințele</small>
+                            </span>
+                        </label>
+
+
+                        <label class="generation-option">
+                            <input
+                                type="radio"
+                                name="tip-continut"
+                                value="cheatsheet"
+                            >
+
+                            <span>
+                                <strong>Cheat sheet</strong>
+                                <small>Rezumat rapid al materiei</small>
+                            </span>
+                        </label>
+
+                    </div>
+
+
+                    <button
+                        class="generate-button"
+                        onclick="genereazaDinCurs()"
+                    >
+                        Generează Material
+                    </button>
+
+                    <div
+                        id="memoratoare-rezultat"
+                        style="margin-top:20px;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+    document.getElementById("zona-continut").innerHTML =
+        `<div class="fade-in">${html}</div>`;
+
+const fileInput = document.getElementById("fisier-curs");
+    const previewContainer = document.getElementById("preview-container");
+
+    fileInput.addEventListener("change", function () {
+
+        const fisiereNoi = Array.from(this.files);
+
+        console.log("Fișiere selectate:", fisiereNoi);
+
+        fisiereSelectate.push(...fisiereNoi);
+
+        afiseazaPreview();
+
+        this.value = "";
+    });
+
+
+    function afiseazaPreview() {
+
+    previewContainer.innerHTML = "";
+
+    if (fisiereSelectate.length === 0) {
+
+        previewContainer.innerHTML =
+            `<span id="fileName">Niciun fișier selectat</span>`;
+
+        return;
+    }
+
+    fisiereSelectate.forEach((fisier, index) => {
+
+        const item = document.createElement("div");
+        item.className = "preview-item";
+
+        if (fisier.type.startsWith("image/")) {
+
+            const img = document.createElement("img");
+
+            img.src = URL.createObjectURL(fisier);
+            img.alt = fisier.name;
+
+            item.appendChild(img);
+
+        } else if (fisier.type === "application/pdf") {
+
+            const pdf = document.createElement("div");
+
+            pdf.className = "pdf-preview";
+
+            pdf.innerHTML = `
+                <div>📄</div>
+                <span>${scapaHtml(fisier.name)}</span>
+            `;
+
+            item.appendChild(pdf);
+        }
+
+        const removeButton = document.createElement("button");
+
+        removeButton.type = "button";
+        removeButton.className = "preview-remove";
+        removeButton.innerHTML = "×";
+
+        removeButton.onclick = function (e) {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            fisiereSelectate.splice(index, 1);
+
+            afiseazaPreview();
+        };
+
+        item.appendChild(removeButton);
+
+        previewContainer.appendChild(item);
+    });
+  }
+
+    // ← AICI se termină arataMemoratoare()
+}
+
+async function genereazaDinCurs() {
+
+    const radioSelectat = document.querySelector(
+        'input[name="tip-continut"]:checked'
+    );
+
+    const zona = document.getElementById("memoratoare-rezultat");
+
+    if (!radioSelectat) {
+        zona.innerHTML = `
+            <p style="color:#B3432F;">
+                ⚠ Alege ce vrei să generezi: Flashcards, Chestionar sau Cheat sheet.
+            </p>
+        `;
+        return;
+    }
+
+    const tip = radioSelectat.value;
+
+    if (fisiereSelectate.length === 0) {
+        zona.innerHTML = `
+            <p style="color:#B3432F;">
+                ⚠ Alege cel puțin un fișier.
+            </p>
+        `;
+        return;
+    }
+
+    console.log("TIP:", tip);
+    console.log("FISIERE:", fisiereSelectate);
+
+    zona.innerHTML = `
+        <div class="grila-loading">
+            <span class="mini-spinner"></span>
+            Se procesează ${fisiereSelectate.length} fișier(e)...
+        </div>
+    `;
+
+    const formData = new FormData();
+
+    fisiereSelectate.forEach(fisier => {
+        formData.append("fisiere", fisier);
+    });
+
+    formData.append("tip", tip);
+
+    try {
+
+        const r = await fetch(
+            "http://localhost:8089/api/genereaza-din-curs",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        const data = await r.json();
+
+        console.log("RĂSPUNS SERVER:", data);
+
+        if (!r.ok) {
+            throw new Error(
+                data.eroare || "Eroare necunoscută."
+            );
+        }
+
+        const continut = JSON.parse(data.rezultat);
+
+        randeazaMemoratoare(continut);
+
+    } catch (e) {
+
+        console.error("EROARE:", e);
+
+        zona.innerHTML = `
+            <p style="color:#B3432F;">
+                ⚠ ${scapaHtml(e.message)}
+            </p>
+        `;
+    }
+}
+
+function randeazaMemoratoare(continut){
+    const zona = document.getElementById('memoratoare-rezultat');
+    let html = `<h3 style="font-family:'Fraunces',serif;">${scapaHtml(continut.titlu || '')}</h3>`;
+
+    if (continut.tip === 'cheatsheet'){
+        continut.elemente.forEach(el => {
+            html += `<div class="resurse-box" style="margin-top:12px;"><h3>${scapaHtml(el.sectiune)}</h3><p>${scapaHtml(el.continut)}</p></div>`;
+        });
+    } else {
+        continut.elemente.forEach(el => {
+            html += `<div class="optiune" style="cursor:default; flex-direction:column; align-items:flex-start; gap:6px;">
+                        <b>${scapaHtml(el.intrebare)}</b>
+                        <span style="color:var(--slate);">${scapaHtml(el.raspuns || (el.variante ? el.variante.join(' / ') : ''))}</span>
+                      </div>`;
+        });
+    }
+
+    zona.innerHTML = html;
+    renderMathInElement(zona, { delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}], throwOnError:false });
+}
+
+
+</script>
+<!-- ================= SETĂRI MODAL ================= -->
+<script>
+  function deschideSetari() {
+
+    const modal = document.getElementById("settings-modal");
+
+    if (!modal) return;
+
+    modal.classList.add("show");
+
+    document.body.style.overflow = "hidden";
+
+    setActiveNav("nav-setari");
+
+    incarcaDateSetari();
+
+}
+
+
+function inchideSetari() {
+
+    const modal = document.getElementById("settings-modal");
+
+    if (!modal) return;
+
+    modal.classList.remove("show");
+
+    document.body.style.overflow = "";
+
+    setActiveNav("nav-acasa");
+
+}
+
+
+/* Închidere cu click pe fundal */
+
+document.addEventListener("click", function(e) {
+
+    const modal = document.getElementById("settings-modal");
+
+    if (
+        modal &&
+        e.target === modal
+    ) {
+        inchideSetari();
+    }
+
+});
+
+
+/* Închidere cu ESC */
+
+document.addEventListener("keydown", function(e) {
+
+    if (e.key === "Escape") {
+
+        const modal = document.getElementById("settings-modal");
+
+        if (
+            modal &&
+            modal.classList.contains("show")
+        ) {
+            inchideSetari();
+        }
+
+    }
+
+});
+
+
+/* SCHIMBAREA CATEGORIEI */
+
+function schimbaSetari(id, buton) {
+
+    document
+        .querySelectorAll(".settings-nav-item")
+        .forEach(el => {
+            el.classList.remove("active");
+        });
+
+    buton.classList.add("active");
+
+
+    document
+        .querySelectorAll(".settings-section")
+        .forEach(el => {
+            el.classList.remove("active");
+        });
+
+
+    const sectiune = document.getElementById(
+        "settings-" + id
+    );
+
+    if (sectiune) {
+
+        sectiune.classList.add("active");
+
+    }
+
+}
+
+
+/* DATE CONT */
+
+function incarcaDateSetari() {
+
+    const username =
+        localStorage.getItem("username");
+
+    if (username) {
+
+        const input =
+            document.getElementById("settings-username");
+
+        if (input) {
+            input.value = username;
+        }
+
+    }
+
+}
+
+
+/* SALVEAZĂ DATE CONT */
+
+function salveazaInformatiiCont() {
+
+    const username =
+        document
+            .getElementById("settings-username")
+            .value
+            .trim();
+
+    if (!username) {
+
+        alert("Introdu un username.");
+
+        return;
+
+    }
+
+    localStorage.setItem(
+        "username",
+        username
+    );
+
+
+    const welcome =
+        document.getElementById("welcome-msg");
+
+    if (welcome) {
+
+        welcome.innerText =
+            `Bine ai venit, ${username}!`;
+
+    }
+
+
+    alert("Modificările au fost salvate.");
+
+}
+
+
+/* TEMĂ */
+
+function schimbaTema(tema) {
+
+    if (tema === "dark") {
+
+        document.body.classList.add("dark-theme");
+
+        localStorage.setItem(
+            "tema",
+            "dark"
+        );
+
+    }
+
+    else if (tema === "light") {
+
+        document.body.classList.remove("dark-theme");
+
+        localStorage.setItem(
+            "tema",
+            "light"
+        );
+
+    }
+
+    else {
+
+        localStorage.setItem(
+            "tema",
+            "system"
+        );
+
+        const dark =
+            window.matchMedia(
+                "(prefers-color-scheme: dark)"
+            ).matches;
+
+        document.body.classList.toggle(
+            "dark-theme",
+            dark
+        );
+
+    }
+
+}
+
+
+/* PREMIUM */
+
+function upgradePremium() {
+
+    alert(
+        "Sistemul de abonamente Premium va fi disponibil în curând."
+    );
+
+}
+
+
+/* SECURITATE */
+
+function delogheazaToateDispozitivele() {
+
+    const confirmare = confirm(
+        "Sigur vrei să deconectezi toate dispozitivele?"
+    );
+
+    if (!confirmare) return;
+
+
+    sessionStorage.removeItem("token");
+
+    alert(
+        "Toate sesiunile au fost închise."
+    );
+
+}
+
+
+/* ȘTERGERE DATE */
+
+function stergeDateStudiu() {
+
+    const confirmare = confirm(
+        "Sigur vrei să ștergi toate datele de studiu? Această acțiune nu poate fi anulată."
+    );
+
+    if (!confirmare) return;
+
+
+    localStorage.removeItem("memoratoare");
+    localStorage.removeItem("flashcards");
+
+    alert(
+        "Datele de studiu au fost șterse."
+    );
+
+}
+
+
+/* ȘTERGERE CONT */
+
+function stergeCont() {
+
+    const confirmare = confirm(
+        "ATENȚIE!\n\nContul și toate datele asociate vor fi șterse permanent.\n\nContinui?"
+    );
+
+    if (!confirmare) return;
+
+
+    localStorage.clear();
+    sessionStorage.clear();
+
+
+    window.location.href =
+        "index.html";
+
+}
+</script>
+<div id="settings-modal" class="settings-overlay">
+
+    <div class="settings-window">
+
+        <!-- HEADER -->
+
+        <div class="settings-header">
+
+            <div>
+                <span class="eyebrow">CONFIGURARE CONT</span>
+                <h2>Setări</h2>
+                <p>Personalizează experiența ta pe UniGuide.</p>
+            </div>
+
+            <button class="settings-close" onclick="inchideSetari()">
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- BODY -->
+
+        <div class="settings-body">
+
+            <!-- SIDEBAR SETĂRI -->
+
+            <div class="settings-nav">
+
+                <button
+                    class="settings-nav-item active"
+                    onclick="schimbaSetari('cont', this)"
+                >
+                    <span>👤</span>
+                    <div>
+                        <strong>Cont</strong>
+                        <small>Date personale</small>
+                    </div>
+                </button>
+
+                <button
+                    class="settings-nav-item"
+                    onclick="schimbaSetari('aspect', this)"
+                >
+                    <span>🎨</span>
+                    <div>
+                        <strong>Aspect</strong>
+                        <small>Interfață și temă</small>
+                    </div>
+                </button>
+
+                <button
+                    class="settings-nav-item"
+                    onclick="schimbaSetari('notificari', this)"
+                >
+                    <span>🔔</span>
+                    <div>
+                        <strong>Notificări</strong>
+                        <small>Preferințe</small>
+                    </div>
+                </button>
+
+                <button
+                    class="settings-nav-item"
+                    onclick="schimbaSetari('abonament', this)"
+                >
+                    <span>💳</span>
+                    <div>
+                        <strong>Abonament</strong>
+                        <small>Planul tău</small>
+                    </div>
+                </button>
+
+                <button
+                    class="settings-nav-item"
+                    onclick="schimbaSetari('securitate', this)"
+                >
+                    <span>🔐</span>
+                    <div>
+                        <strong>Securitate</strong>
+                        <small>Protejează contul</small>
+                    </div>
+                </button>
+
+                <button
+                    class="settings-nav-item danger-nav"
+                    onclick="schimbaSetari('periculos', this)"
+                >
+                    <span>⚠️</span>
+                    <div>
+                        <strong>Zonă periculoasă</strong>
+                        <small>Acțiuni ireversibile</small>
+                    </div>
+                </button>
+
+            </div>
+
+
+            <!-- CONTINUT SETARI -->
+
+            <div class="settings-content">
+
+
+                <!-- ================= CONT ================= -->
+
+                <section class="settings-section active" id="settings-cont">
+
+                    <div class="settings-section-title">
+                        <h3>Cont</h3>
+                        <p>Gestionează informațiile asociate contului tău.</p>
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <div class="settings-card-header">
+                            <div>
+                                <h4>Informații personale</h4>
+                                <p>Datele tale de bază.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="settings-grid">
+
+                            <div class="settings-field">
+                                <label>Username</label>
+                                <input
+                                    type="text"
+                                    id="settings-username"
+                                    placeholder="alex_ase"
+                                >
+                            </div>
+
+                            <div class="settings-field">
+                                <label>Email</label>
+                                <input
+                                    type="email"
+                                    id="settings-email"
+                                    placeholder="email@example.com"
+                                >
+                            </div>
+
+                        </div>
+
+                        <button
+                            class="settings-primary-btn"
+                            onclick="salveazaInformatiiCont()"
+                        >
+                            Salvează modificările
+                        </button>
+
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <div class="settings-card-header">
+                            <div>
+                                <h4>Preferințe de studiu</h4>
+                                <p>Personalizează modul în care UniGuide te ajută să înveți.</p>
+                            </div>
+                        </div>
+
+                        <div class="setting-row">
+
+                            <div>
+                                <strong>Universitatea preferată</strong>
+                                <span>Folosită pentru recomandări și grile.</span>
+                            </div>
+
+                            <select class="settings-select">
+                                <option>Politehnica București</option>
+                                <option>ASE CSIE</option>
+                                <option>Universitatea București</option>
+                                <option>UBB Cluj</option>
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ================= ASPECT ================= -->
+
+                <section class="settings-section" id="settings-aspect">
+
+                    <div class="settings-section-title">
+                        <h3>Aspect</h3>
+                        <p>Personalizează interfața UniGuide.</p>
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <div class="settings-card-header">
+                            <div>
+                                <h4>Temă</h4>
+                                <p>Alege modul în care este afișată platforma.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="theme-options">
+
+                            <label class="theme-option">
+
+                                <input
+                                    type="radio"
+                                    name="theme"
+                                    value="light"
+                                    checked
+                                    onchange="schimbaTema('light')"
+                                >
+
+                                <div class="theme-preview light-preview">
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+
+                                <strong>Deschisă</strong>
+                                <small>Aspect clasic</small>
+
+                            </label>
+
+
+                            <label class="theme-option">
+
+                                <input
+                                    type="radio"
+                                    name="theme"
+                                    value="dark"
+                                    onchange="schimbaTema('dark')"
+                                >
+
+                                <div class="theme-preview dark-preview">
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+
+                                <strong>Întunecată</strong>
+                                <small>Mai confortabilă seara</small>
+
+                            </label>
+
+
+                            <label class="theme-option">
+
+                                <input
+                                    type="radio"
+                                    name="theme"
+                                    value="system"
+                                    onchange="schimbaTema('system')"
+                                >
+
+                                <div class="theme-preview system-preview">
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+
+                                <strong>Sistem</strong>
+                                <small>Urmează setările dispozitivului</small>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <div class="setting-row">
+
+                            <div>
+                                <strong>Animații</strong>
+                                <span>Activează animațiile și tranzițiile UniGuide.</span>
+                            </div>
+
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+
+                        </div>
+
+
+                        <div class="setting-row">
+
+                            <div>
+                                <strong>Interfață compactă</strong>
+                                <span>Reduce spațiul dintre elementele interfeței.</span>
+                            </div>
+
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ================= NOTIFICARI ================= -->
+
+                <section class="settings-section" id="settings-notificari">
+
+                    <div class="settings-section-title">
+                        <h3>Notificări</h3>
+                        <p>Alege ce notificări vrei să primești.</p>
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <div class="setting-row">
+
+                            <div>
+                                <strong>Grila zilei</strong>
+                                <span>Primește o notificare când apare o grilă nouă.</span>
+                            </div>
+
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+
+                        </div>
+
+
+                        <div class="setting-row">
+
+                            <div>
+                                <strong>Reminder de studiu</strong>
+                                <span>Primește un reminder pentru sesiunea ta de studiu.</span>
+                            </div>
+
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+
+                        </div>
+
+
+                        <div class="setting-row">
+
+                            <div>
+                                <strong>Email-uri UniGuide</strong>
+                                <span>Noutăți, funcționalități și informații importante.</span>
+                            </div>
+
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ================= ABONAMENT ================= -->
+
+                <section class="settings-section" id="settings-abonament">
+
+                    <div class="settings-section-title">
+                        <h3>Abonament</h3>
+                        <p>Gestionează planul tău UniGuide.</p>
+                    </div>
+
+
+                    <div class="subscription-card">
+
+                        <div>
+
+                            <span class="subscription-label">
+                                PLAN ACTUAL
+                            </span>
+
+                            <h3>UniGuide Free</h3>
+
+                            <p>
+                                Ai acces la funcțiile de bază ale platformei.
+                            </p>
+
+                        </div>
+
+                        <span class="subscription-badge">
+                            ACTIV
+                        </span>
+
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <h4>UniGuide Premium</h4>
+
+                        <p class="settings-description">
+                            Deblochează funcții avansate pentru o experiență
+                            completă de studiu.
+                        </p>
+
+                        <ul class="premium-list">
+
+                            <li>✓ Memoratoare AI nelimitate</li>
+                            <li>✓ Flashcards avansate</li>
+                            <li>✓ Acces complet la bazele de date</li>
+                            <li>✓ Compiler C++ fără limite</li>
+                            <li>✓ Statistici avansate de progres</li>
+                            <li>✓ Fără reclame</li>
+
+                        </ul>
+
+                        <button
+                            class="premium-btn"
+                            onclick="upgradePremium()"
+                        >
+                            Upgrade la Premium →
+                        </button>
+
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <div class="setting-row">
+
+                            <div>
+                                <strong>Istoric plăți</strong>
+                                <span>Vezi tranzacțiile asociate contului.</span>
+                            </div>
+
+                            <button class="secondary-btn">
+                                Vezi istoricul
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ================= SECURITATE ================= -->
+
+                <section class="settings-section" id="settings-securitate">
+
+                    <div class="settings-section-title">
+                        <h3>Securitate</h3>
+                        <p>Protejează-ți contul UniGuide.</p>
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <div class="settings-card-header">
+                            <div>
+                                <h4>Schimbă parola</h4>
+                                <p>Folosește o parolă puternică și unică.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="settings-field">
+                            <label>Parola actuală</label>
+                            <input type="password">
+                        </div>
+
+                        <div class="settings-field">
+                            <label>Parola nouă</label>
+                            <input type="password">
+                        </div>
+
+                        <div class="settings-field">
+                            <label>Confirmă parola nouă</label>
+                            <input type="password">
+                        </div>
+
+                        <button class="settings-primary-btn">
+                            Schimbă parola
+                        </button>
+
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <div class="setting-row">
+
+                            <div>
+                                <strong>Autentificare în doi pași</strong>
+                                <span>
+                                    Adaugă un nivel suplimentar de securitate.
+                                </span>
+                            </div>
+
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <div class="setting-row">
+
+                            <div>
+                                <strong>Sesiuni active</strong>
+                                <span>
+                                    Gestionează dispozitivele conectate la cont.
+                                </span>
+                            </div>
+
+                            <button
+                                class="secondary-btn"
+                                onclick="delogheazaToateDispozitivele()"
+                            >
+                                Deconectează toate
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ================= ZONA PERICULOASA ================= -->
+
+                <section class="settings-section" id="settings-periculos">
+
+                    <div class="settings-section-title">
+
+                        <h3>Zonă periculoasă</h3>
+
+                        <p>
+                            Aceste acțiuni pot afecta permanent contul și datele tale.
+                        </p>
+
+                    </div>
+
+
+                    <div class="danger-card">
+
+                        <div>
+
+                            <h4>Șterge datele de studiu</h4>
+
+                            <p>
+                                Șterge flashcards, memoratoare și materialele
+                                salvate în cont.
+                            </p>
+
+                        </div>
+
+                        <button
+                            class="danger-btn"
+                            onclick="stergeDateStudiu()"
+                        >
+                            Șterge datele
+                        </button>
+
+                    </div>
+
+
+                    <div class="danger-card">
+
+                        <div>
+
+                            <h4>Șterge contul</h4>
+
+                            <p>
+                                Contul și toate datele asociate vor fi șterse
+                                permanent.
+                            </p>
+
+                        </div>
+
+                        <button
+                            class="danger-btn"
+                            onclick="stergeCont()"
+                        >
+                            Șterge contul
+                        </button>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+</body>
+</html>

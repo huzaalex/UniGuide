@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniGuide — Politica de confidențialitate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2430; --paper:#EEF0F3; --paper-card:#FBFBFA; --gold:#E3A438; --gold-deep:#C6862A;
+    --slate:#5B6472; --line: rgba(27,36,48,0.10);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Inter',sans-serif; color:var(--ink); background:var(--paper);
+    background-image:linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:28px 28px; min-height:100vh;
+    animation: driftGrid 45s linear infinite;
+}
+
+@keyframes driftGrid{ from{background-position:0 0;} to{background-position:280px 280px;} }
+  .wrap{ max-width:760px; margin:0 auto; padding:50px 32px 70px; }
+  .back-btn{
+    display:inline-flex; align-items:center; gap:6px; background:transparent; border:1px solid var(--line);
+    color:var(--ink); padding:9px 14px; border-radius:6px; text-decoration:none; font-size:13px; font-weight:600;
+    margin-bottom:30px; transition:all .18s ease;
+  }
+  .back-btn:hover{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .eyebrow{ font-size:11.5px; letter-spacing:2px; text-transform:uppercase; color:var(--gold-deep); font-weight:700; margin:0 0 8px; }
+  h1{ font-family:'Fraunces',serif; font-weight:600; font-size:30px; margin:0 0 6px; }
+  .updated{ font-size:12.5px; color:var(--slate); margin-bottom:36px; }
+  .card{ background:var(--paper-card); border:1px solid var(--line); border-radius:10px; padding:30px 34px; margin-bottom:22px; }
+  .card h2{ font-family:'Fraunces',serif; font-weight:600; font-size:18px; margin:28px 0 10px; }
+  .card h2:first-child{ margin-top:0; }
+  .card p, .card li{ font-size:14px; line-height:1.75; color:#333c48; }
+  .card ul{ margin:8px 0; padding-left:20px; }
+  .disclaimer{
+    background:rgba(227,164,56,0.10); border:1px dashed var(--gold-deep); border-radius:8px;
+    padding:14px 16px; font-size:12.5px; color:var(--slate); margin-bottom:30px; line-height:1.6;
+  }
+  table{ width:100%; border-collapse:collapse; margin:14px 0; font-size:13px; }
+  th, td{ text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); }
+  th{ color:var(--slate); text-transform:uppercase; font-size:11px; letter-spacing:.4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="dashboard.html" class="back-btn">← Înapoi la UniGuide</a>
+
+  <p class="eyebrow">Document legal</p>
+  <h1>Politica de confidențialitate &amp; Cookies</h1>
+  <p class="updated">Ultima actualizare: August 2026</p>
+
+  <div class="disclaimer">
+    Acesta este un document orientativ, folosit pe durata dezvoltării platformei. Nu constituie consultanță juridică — pentru conformitate GDPR completă înainte de lansarea publică, recomandăm revizuirea lui de către un specialist.
+  </div>
+
+  <div class="card">
+    <h2>1. Ce date colectăm</h2>
+    <ul>
+      <li><strong>Date de cont:</strong> username și parolă (stocată criptat, niciodată în clar).</li>
+      <li><strong>Date de utilizare:</strong> progresul tău la grile și flashcards, facultățile pentru care te pregătești.</li>
+      <li><strong>Date tehnice:</strong> jurnalul serverului (adresă IP, tip de browser) — folosit strict pentru securitate și depanare.</li>
+    </ul>
+
+    <h2>2. Cum folosim datele</h2>
+    <ul>
+      <li>Pentru a-ți asigura accesul la cont (autentificare).</li>
+      <li>Pentru a-ți salva progresul și preferințele (ex: facultatea selectată la grila zilei).</li>
+      <li>Pentru a genera conținut personalizat (întrebări, flashcards) prin servicii externe de AI.</li>
+    </ul>
+
+    <h2>3. Servicii terțe</h2>
+    <p>Pentru generarea automată de conținut educațional, platforma trimite anumite cereri (fără date personale identificabile) către furnizori externi de inteligență artificială. Aceste servicii au propriile politici de confidențialitate.</p>
+
+    <h2>4. Păstrarea datelor</h2>
+    <p>Datele contului tău sunt păstrate atât timp cât contul rămâne activ. Poți solicita oricând ștergerea contului și a datelor asociate, scriindu-ne la adresa de contact.</p>
+
+    <h2>5. Drepturile tale</h2>
+    <ul>
+      <li>Dreptul de a accesa datele pe care le deținem despre tine.</li>
+      <li>Dreptul de a solicita corectarea sau ștergerea lor.</li>
+      <li>Dreptul de a-ți retrage oricând consimțământul (ex: ștergerea contului).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>6. Politica de Cookies</h2>
+    <p>Folosim un set minim de tehnologii de stocare locală în browser, necesare funcționării platformei:</p>
+    <table>
+      <tr><th>Nume</th><th>Scop</th><th>Durată</th></tr>
+      <tr><td><code>token</code> (sessionStorage)</td><td>Menține sesiunea de autentificare activă</td><td>Se șterge la închiderea tab-ului</td></tr>
+      <tr><td><code>username</code> (localStorage)</td><td>Afișează numele tău în dashboard</td><td>Până la deconectare manuală</td></tr>
+    </table>
+    <p>Nu folosim cookies de tracking sau publicitate. Nu partajăm date cu rețele de advertising.</p>
+  </div>
+
+  <div class="card">
+    <h2>7. Contact</h2>
+    <p>Pentru orice întrebare legată de datele tale, ne poți scrie la <a href="mailto:contact@uniguide.ro">contact@uniguide.ro</a>.</p>
+  </div>
+</div>
+</body>
+</html>

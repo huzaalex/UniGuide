@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniGuide — Termeni și condiții</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2430; --paper:#EEF0F3; --paper-card:#FBFBFA; --gold:#E3A438; --gold-deep:#C6862A;
+    --slate:#5B6472; --line: rgba(27,36,48,0.10);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Inter',sans-serif; color:var(--ink); background:var(--paper);
+    background-image:linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:28px 28px; min-height:100vh;
+    animation: driftGrid 45s linear infinite;
+}
+
+@keyframes driftGrid{ from{background-position:0 0;} to{background-position:280px 280px;} }
+  .wrap{ max-width:760px; margin:0 auto; padding:50px 32px 70px; }
+  .back-btn{
+    display:inline-flex; align-items:center; gap:6px; background:transparent; border:1px solid var(--line);
+    color:var(--ink); padding:9px 14px; border-radius:6px; text-decoration:none; font-size:13px; font-weight:600;
+    margin-bottom:30px; transition:all .18s ease;
+  }
+  .back-btn:hover{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .eyebrow{ font-size:11.5px; letter-spacing:2px; text-transform:uppercase; color:var(--gold-deep); font-weight:700; margin:0 0 8px; }
+  h1{ font-family:'Fraunces',serif; font-weight:600; font-size:30px; margin:0 0 6px; }
+  .updated{ font-size:12.5px; color:var(--slate); margin-bottom:36px; }
+  .card{ background:var(--paper-card); border:1px solid var(--line); border-radius:10px; padding:30px 34px; }
+  .card h2{ font-family:'Fraunces',serif; font-weight:600; font-size:18px; margin:28px 0 10px; }
+  .card h2:first-child{ margin-top:0; }
+  .card p, .card li{ font-size:14px; line-height:1.75; color:#333c48; }
+  .card ul{ margin:8px 0; padding-left:20px; }
+  .disclaimer{
+    background:rgba(227,164,56,0.10); border:1px dashed var(--gold-deep); border-radius:8px;
+    padding:14px 16px; font-size:12.5px; color:var(--slate); margin-bottom:30px; line-height:1.6;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="dashboard.html" class="back-btn">← Înapoi la UniGuide</a>
+
+  <p class="eyebrow">Document legal</p>
+  <h1>Termeni și condiții</h1>
+  <p class="updated">Ultima actualizare: August 2026</p>
+
+  <div class="disclaimer">
+    Acesta este un document orientativ, folosit pe durata dezvoltării platformei. Nu constituie consultanță juridică — înainte de lansarea publică, recomandăm revizuirea lui de către un specialist.
+  </div>
+
+  <div class="card">
+    <h2>1. Despre platformă</h2>
+    <p>UniGuide este o platformă educațională destinată elevilor și studenților care se pregătesc pentru admiterea la facultate, oferind resurse de studiu, grile generate automat și instrumente conexe (flashcards, editor de cod, calculator de șanse).</p>
+
+    <h2>2. Contul de utilizator</h2>
+    <ul>
+      <li>Ești responsabil pentru păstrarea confidențialității parolei tale.</li>
+      <li>Un cont este destinat utilizării personale, nu poate fi partajat.</li>
+      <li>Ne rezervăm dreptul de a suspenda conturi folosite abuziv (spam, încercări repetate de autentificare eșuate, etc.).</li>
+    </ul>
+
+    <h2>3. Conținut generat de AI</h2>
+    <p>Grilele, întrebările și explicațiile generate automat (cu ajutorul unor modele de inteligență artificială) au scop strict educațional și orientativ. Ele pot conține ocazional erori — platforma nu garantează acuratețea 100% a conținutului generat și recomandă verificarea informațiilor importante din surse oficiale (culegeri, ghiduri de admitere ale universităților).</p>
+
+    <h2>4. Utilizare acceptabilă</h2>
+    <ul>
+      <li>Nu folosi platforma pentru a încărca conținut ilegal, ofensator sau care încalcă drepturile de autor ale altcuiva.</li>
+      <li>Nu încerca să accesezi conturile altor utilizatori sau să perturbi funcționarea serviciului.</li>
+    </ul>
+
+    <h2>5. Limitarea răspunderii</h2>
+    <p>Platforma este oferită „ca atare", fără garanții privind disponibilitatea neîntreruptă. Nu suntem răspunzători pentru decizii academice (ex: rezultatul admiterii) luate pe baza informațiilor din platformă.</p>
+
+    <h2>6. Modificări</h2>
+    <p>Acești termeni pot fi actualizați periodic. Continuarea folosirii platformei după o actualizare reprezintă acceptarea noilor termeni.</p>
+
+    <h2>7. Contact</h2>
+    <p>Pentru întrebări legate de acești termeni, ne poți scrie la <a href="mailto:contact@uniguide.ro">contact@uniguide.ro</a>.</p>
+  </div>
+</div>
+</body>
+</html>

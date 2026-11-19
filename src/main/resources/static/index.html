@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniGuide — Autentificare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2430; --ink-soft:#2A3644; --paper:#EEF0F3; --paper-card:#FBFBFA;
+    --gold:#E3A438; --gold-deep:#C6862A; --teal:#2C6E6B; --slate:#5B6472;
+    --line: rgba(27,36,48,0.10); --shadow: 0 20px 50px rgba(27,36,48,0.16);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; font-family:'Inter',sans-serif; color:var(--ink);
+    display:flex;
+  }
+
+  .forgot-link {
+    display: block;
+    text-align: right;
+    margin-top: -8px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--slate);
+    text-decoration: none;
+  }
+
+  .forgot-link:hover {
+      color: var(--gold-deep);
+  }
+  
+
+  /* ===== LEFT: BRAND PANEL ===== */
+  .brand-panel{
+    flex:1; background:var(--ink); color:#fff; position:relative; overflow:hidden;
+    display:flex; flex-direction:column; justify-content:center; padding:60px 64px;
+    min-width:0;
+  }
+  .brand-panel::before{
+    content:""; position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+    background-size:34px 34px;
+    animation:driftGrid 40s linear infinite;
+  }
+  @keyframes driftGrid{ from{background-position:0 0;} to{background-position:340px 340px;} }
+
+  .floating-card{ position:absolute; width:150px; height:96px; }
+.fc1{ top:12%; right:8%; }
+.fc2{ bottom:16%; right:22%; width:120px; height:80px; }
+.fc3{ top:46%; right:-2%; width:100px; height:70px; }
+
+.floating-card .floaty-inner{
+  position:relative; width:100%; height:100%; border-radius:8px;
+  background:var(--paper-card); box-shadow:0 18px 40px rgba(0,0,0,0.35); opacity:.92;
+}
+.floating-card .floaty-inner::before{
+  content:""; position:absolute; top:0; right:0; width:0; height:0;
+  border-style:solid; border-width:0 16px 16px 0; border-color:transparent var(--paper) transparent transparent;
+}
+.floating-card .floaty-inner span{ position:absolute; left:14px; bottom:12px; right:14px; height:3px; background:var(--line); border-radius:2px; box-shadow:0 8px 0 var(--line);}
+
+  .brand-content{position:relative; z-index:2; max-width:440px;}
+  .brand-mark{
+    font-family:'Fraunces',serif; font-weight:700; font-size:26px; margin-bottom:26px;
+  }
+  .brand-mark span{color:var(--gold);}
+  .brand-content h1{
+    font-family:'Fraunces',serif; font-weight:600; font-size:40px; line-height:1.18; margin:0 0 18px;
+  }
+  .brand-content h1 em{color:var(--gold); font-style:normal;}
+  .brand-content p{ color:#B9C1CD; font-size:15px; line-height:1.7; margin:0 0 30px; }
+  .brand-stats{display:flex; gap:34px;}
+  .brand-stats div b{
+    display:block; font-family:'JetBrains Mono',monospace; font-size:20px; color:var(--gold);
+  }
+  .brand-stats div small{ color:#8891A0; font-size:11.5px; letter-spacing:.4px; }
+
+.guest-link {
+    display: block;
+    text-align: center;
+    margin-top: 16px;
+    font-size: 12.5px;
+    color: var(--slate);
+    text-decoration: none;
+}
+
+.guest-link:hover {
+    color: var(--gold-deep);
+}
+
+
+  /* ===== RIGHT: AUTH PANEL ===== */
+  .auth-panel{
+    width:480px; flex-shrink:0; background:var(--paper); display:flex; align-items:center; justify-content:center;
+    padding:40px; position:relative;
+  }
+  .auth-card{
+    width:100%; max-width:360px; background:var(--paper-card); border:1px solid var(--line);
+    border-radius:12px; padding:34px 32px 30px; box-shadow:var(--shadow);
+    animation:cardIn .6s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes cardIn{ from{opacity:0; transform:translateY(16px) scale(.98);} to{opacity:1; transform:translateY(0) scale(1);} }
+
+  .tabs{
+    display:flex; background:var(--paper); border-radius:8px; padding:4px; position:relative; margin-bottom:26px;
+  }
+  .tab-indicator{
+    position:absolute; top:4px; bottom:4px; left:4px; width:calc(50% - 4px);
+    background:var(--ink); border-radius:6px; transition:transform .3s cubic-bezier(.2,.8,.2,1);
+  }
+  .tab{
+    flex:1; z-index:1; text-align:center; padding:10px 0; font-size:13.5px; font-weight:600;
+    color:var(--slate); cursor:pointer; transition:color .3s ease; user-select:none;
+  }
+  .tab.active{color:#fff;}
+
+  .panes{position:relative;}
+  .pane{display:none;}
+  .pane.active{display:block; animation:fadeSlide .35s ease both;}
+  @keyframes fadeSlide{ from{opacity:0; transform:translateX(8px);} to{opacity:1; transform:translateX(0);} }
+
+  .pane h2{ font-family:'Fraunces',serif; font-weight:600; font-size:22px; margin:0 0 4px; }
+  .pane .sub{ color:var(--slate); font-size:13px; margin:0 0 22px; }
+
+  .field{margin-bottom:16px;}
+  .field label{
+    display:block; font-size:11.5px; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
+    color:var(--slate); margin-bottom:6px;
+  }
+  .field .input-wrap{position:relative;}
+  .field input{
+    width:100%; padding:11px 13px; border:1.5px solid var(--line); border-radius:7px;
+    font-size:14px; font-family:'Inter',sans-serif; background:#fff; color:var(--ink);
+    transition:border-color .18s ease, box-shadow .18s ease;
+  }
+  .field input:focus{
+    outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(227,164,56,0.18);
+  }
+  .toggle-eye{
+    position:absolute; right:11px; top:50%; transform:translateY(-50%);
+    cursor:pointer; font-size:13px; color:var(--slate); user-select:none;
+  }
+
+  .submit-btn{
+    width:100%; padding:12px; margin-top:6px; border:none; border-radius:7px;
+    background:var(--ink); color:#fff; font-size:14.5px; font-weight:700; cursor:pointer;
+    letter-spacing:.2px; position:relative; overflow:hidden;
+    transition:transform .15s ease, background .2s ease;
+  }
+  .submit-btn:hover{ background:var(--ink-soft); transform:translateY(-1px); }
+  .submit-btn:active{ transform:translateY(0); }
+  .submit-btn .spinner{
+    display:none; width:15px; height:15px; border:2px solid rgba(255,255,255,0.35);
+    border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite;
+    position:absolute; left:50%; top:50%; margin:-8px 0 0 -8px;
+  }
+  .submit-btn.loading .btn-text{visibility:hidden;}
+  .submit-btn.loading .spinner{display:block;}
+  @keyframes spin{ to{transform:rotate(360deg);} }
+
+  .message{
+    font-size:13px; font-weight:600; margin-top:14px; text-align:center; min-height:18px;
+    opacity:0; transform:translateY(-4px); transition:all .25s ease;
+  }
+  .message.show{opacity:1; transform:translateY(0);}
+  .message.ok{color:var(--teal);}
+  .message.err{color:#B3432F;}
+
+  .rules{
+    font-size:11.5px; color:var(--slate); margin:-6px 0 16px; line-height:1.6;
+    background:var(--paper); border-radius:6px; padding:10px 12px; border:1px dashed var(--line);
+  }
+  /*Dreptunghiuri animate inceput*/
+  .floaty-zone{ position:relative; }
+.floaty{ cursor:pointer; will-change:transform; }
+.floaty-inner{
+  transition: box-shadow .2s ease, transform .35s ease;
+}
+.floaty:hover .floaty-inner{ box-shadow:0 22px 46px rgba(0,0,0,0.28); }
+
+.floaty-inner.nudge{ animation:floatyNudge .4s ease; }
+@keyframes floatyNudge{
+  0%{ transform:scale(1) rotate(0deg); }
+  35%{ transform:scale(1.06) rotate(-3deg); }
+  65%{ transform:scale(0.97) rotate(3deg); }
+  100%{ transform:scale(1) rotate(0deg); }
+}
+
+.floaty-popup{
+  position:absolute; bottom:calc(100% + 10px); left:50%;
+  transform:translateX(-50%) translateY(6px);
+  background:var(--ink); color:#fff; padding:10px 14px; border-radius:8px;
+  font-size:12px; width:190px; text-align:left; line-height:1.5;
+  box-shadow:0 14px 28px rgba(0,0,0,0.32);
+  opacity:0; transition:opacity .2s ease, transform .2s ease;
+  pointer-events:none; z-index:30; font-family:'Inter',sans-serif;
+}
+.floaty-popup::after{
+  content:""; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+  border:6px solid transparent; border-top-color:var(--ink);
+}
+.floaty-popup.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/*Formule mate-info-fizica*/
+
+.deco-formula{
+  position:absolute; font-family:'JetBrains Mono',monospace; color:rgba(255,255,255,0.09);
+  white-space:nowrap; pointer-events:none; user-select:none; z-index:1;
+  animation:decoFloat 14s ease-in-out infinite;
+}
+@keyframes decoFloat{
+  0%,100%{ transform:translateY(0) rotate(var(--r,0deg)); }
+  50%{ transform:translateY(-10px) rotate(var(--r,0deg)); }
+}
+/*Dreptunghiuri animate final*/
+
+  footer{
+    margin-top:56px; background:var(--ink); color:#AEB6C2; padding:38px 32px 24px; position:relative; overflow:hidden;
+  }
+  footer::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:5px;
+    background:repeating-linear-gradient(180deg, var(--gold) 0 8px, transparent 8px 20px); opacity:.5;
+  }
+  .footer-inner{ max-width:880px; margin:0 auto; }
+  .footer-top{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:32px; margin-bottom:30px; }
+
+  .footer-brand .brand-mark{ font-family:'Fraunces',serif; font-weight:700; font-size:19px; color:#fff; margin-bottom:8px; }
+  .footer-brand .brand-mark span{ color:var(--gold); }
+  .footer-brand p{ font-size:12.5px; color:#8891A0; max-width:260px; line-height:1.6; margin:0; }
+
+  .footer-col h4{ font-size:11.5px; letter-spacing:1px; text-transform:uppercase; color:var(--gold); margin:0 0 12px; font-weight:700; }
+  .footer-col a{ display:block; color:#AEB6C2; text-decoration:none; font-size:13px; margin-bottom:9px; transition:color .15s ease; }
+  .footer-col a:hover{ color:#fff; }
+
+  .footer-contact a{ display:flex; align-items:center; gap:8px; }
+
+  .social-row{ display:flex; gap:10px; margin-top:4px; }
+  .social-row a{
+    width:34px; height:34px; border-radius:8px; background:rgba(255,255,255,0.06); display:flex;
+    align-items:center; justify-content:center; font-size:15px; text-decoration:none; color:#C7CDD6;
+    transition:background .18s ease, transform .18s ease;
+  }
+  .social-row a:hover{ background:var(--gold); color:var(--ink); transform:translateY(-2px); }
+
+  .footer-bottom{
+    border-top:1px solid rgba(255,255,255,0.08); padding-top:18px; display:flex; flex-wrap:wrap;
+    justify-content:space-between; gap:10px; font-size:12px; color:#7C879A;
+  }
+  .footer-bottom .legal-links{ display:flex; gap:18px; flex-wrap:wrap; }
+  .footer-bottom .legal-links a{ color:#7C879A; text-decoration:none; }
+  .footer-bottom .legal-links a:hover{ color:#fff; }
+
+  @media (max-width:860px){
+    .brand-panel{display:none;}
+    .auth-panel{width:100%;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+  
+  <div class="brand-panel floaty-zone">
+    <div class="floaty floating-card fc1" data-popup="Flashcards generate automat din cursurile tale, cu ajutorul AI.">
+      <div class="floaty-inner"><span></span></div>
+    </div>
+    <div class="floaty floating-card fc2" data-popup="Streak zilnic — vezi câte zile la rând ai exersat.">
+      <div class="floaty-inner"><span></span></div>
+    </div>
+    <div class="floaty floating-card fc3" data-popup="Grila zilei — o întrebare nouă în fiecare zi, pentru fiecare facultate.">
+      <div class="floaty-inner"><span></span></div>
+    </div>
+
+    <div class="brand-content">
+      <div class="brand-mark">Uni<span>Guide</span></div>
+      <h1>Studiază mai inteligent,<br><em>nu doar mai mult.</em></h1>
+      <p>Platforma ta completă de studiu, creată special pentru a-ți asigura drumul de la liceu la facultatea dorită. 
+        UniGuide îți pune la dispoziție ghiduri detaliate de admitere și baze de date cu subiecte rezolvate pentru marile centre universitare: 
+        Politehnica București, ASE CSIE, Universitatea din București și UBB Cluj.</p>
+        
+      <p>De la sinteze esențiale pentru Bacalaureat, 
+        până la tehnici avansate de memorare prin flashcards generate automat din suportul tău de curs, ai totul la un click distanță. 
+        În plus, îți poți exersa algoritmii direct în browser cu ajutorul compilatorului de C++ integrat, optimizându-ți pregătirea în cel mai eficient mod posibil.</p>
+      <div class="brand-stats">
+        <div><b>4</b><small>UNIVERSITĂȚI</small></div>
+        <div><b>∞</b><small>FLASHCARDS</small></div>
+        <div><b>1</b><small>CONT DE STUDENT</small></div>
+      </div>
+    </div>
+  </div>
+  <div class="deco-formula" style="top:6%; left:6%; font-size:22px; --r:-4deg;">∫ f(x)dx = F(b) − F(a)</div>
+<div class="deco-formula" style="top:22%; right:20%; font-size:16px; --r:3deg; animation-delay:1.2s;">for(int i=0; i&lt;n; i++)</div>
+<div class="deco-formula" style="bottom:28%; right:80%; font-size:20px; --r:-4deg; animation-delay:2.4s;">F = m·a</div>
+<div class="deco-formula" style="top:56%; right:56%; font-size:15px; --r:2deg; animation-delay:0.6s;">while(!ok){ solve(); }</div>
+<div class="deco-formula" style="bottom:12%; right:34%; font-size:18px; --r:-3deg; animation-delay:3s;">E = mc²</div>
+<div class="deco-formula" style="top:40%; left:4%; font-size:14px; --r:1deg; animation-delay:1.8s;">Σ P(x) = 1</div>
+<div class="deco-formula" style="bottom:6%; left:44%; font-size:16px; --r:-1deg; animation-delay:2.2s;">std::vector&lt;int&gt; v;</div>
+<div class="deco-formula" style="top:80%; left:22%; font-size:15px; --r:4deg; animation-delay:0.9s;">lim(x→∞) 1/x = 0</div>
+  <div class="auth-panel">
+    <div class="auth-card">
+      <div class="tabs">
+        <div class="tab-indicator" id="tab-indicator"></div>
+        <div class="tab active" id="tab-login" onclick="schimbaTab('login')">Autentificare</div>
+        <div class="tab" id="tab-register" onclick="schimbaTab('register')">Înregistrare</div>
+      </div>
+
+      <div class="panes">
+       <!-- LOGIN -->
+<div class="pane active" id="pane-login">
+    <h2>Bine ai revenit</h2>
+    <p class="sub">Conectează-te pentru a continua studiul.</p>
+
+    <div id="g_id_onload"
+     data-client_id="922588552673-aegf48elcmkqr3a6nrl02hb3mh8a7757.apps.googleusercontent.com"
+     data-callback="handleGoogleLogin">
+        </div>
+        <div class="g_id_signin" data-type="standard" data-theme="outline" data-size="large" data-width="300"></div>
+
+        <div style="display:flex; align-items:center; gap:10px; margin:18px 0; color:var(--slate); font-size:12px;">
+          <div style="flex:1; height:1px; background:var(--line);"></div>
+          SAU
+          <div style="flex:1; height:1px; background:var(--line);"></div>
+        </div>
+
+    <div class="field">
+        <label>Username</label>
+        <input type="text" id="log-user" placeholder="ex: alex_ase">
+    </div>
+
+    <div class="field">
+        <label>Parolă</label>
+        <div class="input-wrap">
+            <input type="password" id="log-pass" placeholder="••••••••">
+            <span class="toggle-eye" onclick="toggleParola('log-pass', this)">
+                arată
+            </span>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <a href="forgot-password.html" class="forgot-link">
+        Ai uitat parola?
+    </a>
+
+    <button class="submit-btn" id="btn-login" onclick="trimiteDate('login')">
+        <span class="btn-text">Conectare</span>
+        <span class="spinner"></span>
+    </button>
+
+    <a href="dashboard.html" class="guest-link">
+        Continuă fără cont
+    </a>
+
+    <div id="log-msg" class="message"></div>
+</div>
+        <!-- REGISTER -->
+<div class="pane" id="pane-register">
+    <h2>Creează-ți contul</h2>
+    <p class="sub">Durează mai puțin de un minut.</p>
+
+    <div class="field">
+        <label>Username</label>
+        <input type="text" id="reg-user" placeholder="alege un username">
+    </div>
+
+    <div class="field">
+        <label>Email</label>
+        <input
+            type="email"
+            id="reg-email"
+            placeholder="ex: nume-prenume@gmail.com"
+        >
+    </div>
+
+    <div class="field">
+        <label>Parolă</label>
+        <div class="input-wrap">
+            <input type="password" id="reg-pass" placeholder="••••••••">
+            <span class="toggle-eye" onclick="toggleParola('reg-pass', this)">
+                arată
+            </span>
+        </div>
+    </div>
+
+    <div class="rules">
+        Minim 8 caractere · o literă mare · 4 cifre · un caracter special (!@#$ etc.)
+    </div>
+
+    <button class="submit-btn" id="btn-register" onclick="trimiteDate('register')">
+        <span class="btn-text">Creează cont</span>
+        <span class="spinner"></span>
+    </button>
+
+    <div id="reg-msg" class="message"></div>
+</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+async function handleGoogleLogin(response){
+  const idToken = response.credential;
+
+  try {
+    const r = await fetch('http://localhost:8089/api/google-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken })
+    });
+    const data = await r.json();
+
+    if (r.ok) {
+      sessionStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
+      window.location.href = 'dashboard.html';
+    } else {
+      alert(data.eroare || "Eroare la autentificare.");
+    }
+  } catch (e) {
+    alert("Serverul nu este pornit.");
+  }
+}
+</script>
+
+
+<script>
+  function schimbaTab(tab){
+    document.getElementById('tab-indicator').style.transform =
+      tab === 'login' ? 'translateX(0)' : 'translateX(100%)';
+    document.getElementById('tab-login').classList.toggle('active', tab==='login');
+    document.getElementById('tab-register').classList.toggle('active', tab==='register');
+    document.getElementById('pane-login').classList.toggle('active', tab==='login');
+    document.getElementById('pane-register').classList.toggle('active', tab==='register');
+  }
+
+  function toggleParola(id, el){
+    const input = document.getElementById(id);
+    const vizibil = input.type === 'text';
+    input.type = vizibil ? 'password' : 'text';
+    el.innerText = vizibil ? 'arată' : 'ascunde';
+  }
+
+  async function trimiteDate(actiune) {
+
+    const u = document.getElementById(
+        actiune === 'register' ? 'reg-user' : 'log-user'
+    ).value;
+
+    const p = document.getElementById(
+        actiune === 'register' ? 'reg-pass' : 'log-pass'
+    ).value;
+
+    const email = actiune === 'register'
+        ? document.getElementById('reg-email').value
+        : null;
+
+    const msgDiv = document.getElementById(
+        actiune === 'register' ? 'reg-msg' : 'log-msg'
+    );
+
+    const btn = document.getElementById(
+        actiune === 'register' ? 'btn-register' : 'btn-login'
+    );
+
+    msgDiv.classList.remove('show');
+
+    if (!u || !p || (actiune === 'register' && !email)) {
+        mesajAfiseaza(
+            msgDiv,
+            actiune === 'register'
+                ? "Completează username-ul, emailul și parola."
+                : "Completează username-ul și parola.",
+            false
+        );
+        return;
+    }
+
+    btn.classList.add('loading');
+
+    try {
+        const response = await fetch(
+            `http://localhost:8089/api/${actiune}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: u,
+                    parola: p,
+                    email: email
+                })
+            }
+        );
+
+        if (actiune === 'login') {
+
+            const rezultat = await response.json();
+
+            mesajAfiseaza(
+                msgDiv,
+                response.ok ? rezultat.mesaj : rezultat.eroare,
+                response.ok
+            );
+
+            if (response.ok) {
+                sessionStorage.setItem('token', rezultat.token);
+                localStorage.setItem("username", u);
+
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 1200);
+            }
+
+        } else {
+
+            const rezultat = await response.text();
+
+            mesajAfiseaza(
+                msgDiv,
+                rezultat,
+                response.ok
+            );
+
+            if (response.ok) {
+                setTimeout(() => schimbaTab('login'), 1400);
+            }
+        }
+
+    } catch (error) {
+
+        mesajAfiseaza(
+            msgDiv,
+            "Serverul Java nu este pornit.",
+            false
+        );
+
+    } finally {
+        btn.classList.remove('loading');
+    }
+}
+
+  function mesajAfiseaza(el, text, ok){
+    el.innerText = (ok ? "✓ " : "✕ ") + text.replace(/^[❌✅🎉]\s*/u, '');
+    el.className = 'message show ' + (ok ? 'ok' : 'err');
+  }
+</script>
+
+<script src="float-cards.js"></script>
+
+</body>
+</html>
